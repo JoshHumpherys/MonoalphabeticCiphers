@@ -20,11 +20,58 @@ function reverseString(str) {
     return str.split('').reverse().join('');
 }
 
-function main() {
-    for(var i = 1; i < 26; i++) {
-        console.log(shiftString(str, i));
-        console.log('-----------------------------------------------------------');
-        console.log(reverseString(shiftString(str, i)));
-        console.log('-----------------------------------------------------------');
+function calculateLetterOccurrences(str) {
+    let occurences = {};
+    for(var i = 'a'.charCodeAt(0); i <= 'z'.charCodeAt(0); i++) {
+        occurences[String.fromCharCode(i)] = 0;
     }
+    let array = str.toLowerCase().split('');
+    for(var i = 0; i < array.length; i++) {
+        if(/^[a-z]*$/.test(array[i])) {
+            occurences[array[i]] += 1;
+        }
+    }
+    return occurences;
+}
+
+function calculateLetterFrequencies(str) {
+    let frequencies = {};
+    let occurences = calculateLetterOccurrences(str);
+    for(var i = 'a'.charCodeAt(0); i <= 'z'.charCodeAt(0); i++) {
+        let char = String.fromCharCode(i);
+        frequencies[char] = occurences[char] / str.length;
+    }
+    return frequencies;
+}
+
+function calculateMean(array) {
+    let sum = 0;
+    for(var i = 0; i < array.length; i++) {
+        sum += array[i];
+    }
+    return sum / array.length;
+}
+
+function calculateStandardDeviation(array) {
+    let mean = calculateMean(array);
+    let sum = 0;
+    for(var i = 0; i < array.length; i++) {
+        sum += Math.pow(array[i] - mean, 2);
+    }
+    return Math.sqrt(sum / array.length);
+}
+
+function main() {
+    // for(var i = 1; i < 26; i++) {
+    //     console.log(shiftString(str, i));
+    //     console.log('-----------------------------------------------------------');
+    //     console.log(reverseString(shiftString(str, i)));
+    //     console.log('-----------------------------------------------------------');
+    // }
+    let frequencies = calculateLetterFrequencies(str);
+    // let frequencyValues = Object.values(frequencies);
+    let frequencyValues = Object.keys(frequencies).map(function(key) {
+        return frequencies[key];
+    });
+    console.log(calculateStandardDeviation(frequencyValues));
 }
