@@ -19,8 +19,56 @@ function shiftString(str, shift) {
     return array.join('');
 }
 
+function affineStringInverse(str, a, b) {
+    if(a % 26 == 0 || 26 % a == 0) {
+        return '';
+    }
+    let inverse = 1;
+    while((a * inverse) % 26 != 1) {
+        inverse++;
+    }
+    let array = str.toLowerCase().split('');
+    let aCharCode = 'a'.charCodeAt(0);
+    for(let i = 0; i < array.length; i++) {
+        if(/^[a-z]*$/.test(array[i])) {
+            let charCodeCipherText = array[i].charCodeAt(0) - aCharCode;
+            let charCodePlainText = (((inverse * (charCodeCipherText - b)) % 26) + 26) % 26;
+            array[i] = String.fromCharCode(charCodePlainText + aCharCode);
+        }
+    }
+    return array.join('');
+}
+
+function affineString(str, a, b) {
+    let array = str.toLowerCase().split('');
+    let aCharCode = 'a'.charCodeAt(0);
+    for(let i = 0; i < array.length; i++) {
+        if(/^[a-z]*$/.test(array[i])) {
+            let charCodeCipherText = array[i].charCodeAt(0) - aCharCode;
+            let charCodePlainText = (((a * charCodeCipherText + b) % 26) + 26) % 26;
+            array[i] = String.fromCharCode(charCodePlainText + aCharCode);
+        }
+    }
+    return array.join('');
+}
+
 function reverseString(str) {
     return str.split('').reverse().join('');
+}
+
+function encryptWithKey(str, key) {
+    let array = str.split('');
+    let keyArray = key.split('');
+    let encrytedArray = [];
+    let aCharCode = 'a'.charCodeAt(0);
+    for(let i = 0; i < array.length; i++) {
+        if(/^[a-z]*$/.test(array[i])) {
+            encrytedArray[i] = keyArray[array[i].charCodeAt(0) - aCharCode];
+        } else {
+            encrytedArray[i] = array[i];
+        }
+    }
+    return encrytedArray.join('');
 }
 
 function calculateLetterOccurrences(str) {
@@ -99,14 +147,92 @@ function main() {
     //     console.log(reverseString(shiftString(str, i)));
     //     console.log('-----------------------------------------------------------');
     // }
-    let frequencies = calculateLetterFrequencies(str);
-    // let frequencyValues = Object.values(frequencies);
-    let frequencyValues = Object.keys(frequencies).map(function(key) {
-        return frequencies[key];
-    });
-    // console.log(calculateStandardDeviation(frequencyValues));
-    let ordering = calculateOrdering(frequencyValues);
+    // let frequencies = calculateLetterFrequencies(str);
+    // // let frequencyValues = Object.values(frequencies);
+    // let frequencyValues = Object.keys(frequencies).map(function(key) {
+    //     return frequencies[key];
+    // });
+    // // console.log(calculateStandardDeviation(frequencyValues));
+    // let ordering = calculateOrdering(frequencyValues);
     // console.log(ordering);
-    console.log(reorderLetters(str, ordering));
-    // console.log(frequencies);
+    // // console.log(ordering);
+    // console.log(reorderLetters(str, ordering));
+    // // console.log(frequencies);
+    // let count = 0;
+    // for(let i = 1; i <= 25; i += 2) {
+    //     if(i != 13) {
+    //         for(let j = 0; j < 26; j++) {
+    //             let plainText = affineStringInverse(str, i, j);
+    //             console.log(count++);
+    //             console.log(plainText);
+    //             // let frequencies = calculateLetterFrequencies(str);
+    //             // let frequencyValues = Object.keys(frequencies).map(function(key) {
+    //             //     return frequencies[key];
+    //             // });
+    //             // let ordering = calculateOrdering(frequencyValues);
+    //             // console.log(reorderLetters(str, ordering));
+    //         }
+    //     }
+    // }
+    // let plainText = reorderLetters(str, ordering);
+    // for(let i = englishLetterOrderingArray.length - 1; i >= 0; i--) {
+    //     if(i > 6) {
+    //         plainText = plainText.split(englishLetterOrderingArray[i]).join('-');
+    //     }
+    // }
+    // console.log(plainText);
+    // let plainText = affineStringInverse(str, 25, 25);
+    // let frequencies = calculateLetterFrequencies(plainText);
+    // let frequencyValues = Object.keys(frequencies).map(function(key) {
+    //     return frequencies[key];
+    // });
+    // let ordering = calculateOrdering(frequencyValues);
+    // console.log(ordering);
+    // console.log(reorderLetters(plainText, ordering));
+    let plainText = affineStringInverse(str, 25, 25);
+    let alphabet = 'abcdefghijklmnopqrstuvwxyz';
+    let key = affineString(alphabet, 25, 25);
+    let plainTextArray = plainText.split('');
+    let keyArray = key.split('');
+    let ordering = [0, 2, 1, 3, 4, 5, 6, 16, 8, 9, 10, 11, 21, 13, 14, 15, 7, 17, 18, 19, 20, 12, 22, 24, 23, 25];
+    let plainTextArrayAdjusted = [];
+    for(let i = 0; i < plainTextArray.length; i++) {
+        if(/^[a-z]*$/.test(plainTextArray[i])) {
+            plainTextArrayAdjusted[i] = String.fromCharCode('a'.charCodeAt(0) + ordering[plainTextArray[i].charCodeAt(0) - 'a'.charCodeAt(0)]);
+        } else {
+            plainTextArrayAdjusted[i] = plainTextArray[i];
+        }
+    }
+    let keyArrayAdjusted = [];
+    for(let i = 0; i < keyArray.length; i++) {
+        keyArrayAdjusted[i] = String.fromCharCode('a'.charCodeAt(0) + ordering[keyArray[i].charCodeAt(0) - 'a'.charCodeAt(0)]);
+    }
+    plainText = plainTextArrayAdjusted.join('');
+    key = keyArrayAdjusted.join('');
+    console.log('PLAINTEXT:');
+    console.log(plainText);
+    keyArray = alphabet.split('');
+    let alphabetArray = key.split('');
+    for(let i = 0; i < alphabetArray.length; i++) {
+        let smallestValue = 'a'.charCodeAt(0) + 26;
+        let smallestIndex = 26;
+        for(let j = i; j < alphabetArray.length; j++) {
+            if(alphabetArray[j].charCodeAt(0) < smallestValue) {
+                smallestValue = alphabetArray[j].charCodeAt(0);
+                smallestIndex = j;
+            }
+        }
+        let temp = keyArray[i];
+        keyArray[i] = keyArray[smallestIndex];
+        keyArray[smallestIndex] = temp;
+        temp = alphabetArray[i];
+        alphabetArray[i] = alphabetArray[smallestIndex];
+        alphabetArray[smallestIndex] = temp;
+    }
+    alphabet = alphabetArray.join('');
+    key = keyArray.join('');
+    console.log('KEY:');
+    console.log(alphabet);
+    console.log(key);
+    // console.log(encryptWithKey(plainText, key) == str.toLowerCase());
 }
